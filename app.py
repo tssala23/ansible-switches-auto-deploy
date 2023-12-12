@@ -92,21 +92,16 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
     ):  # Create the messages for the alerts, different depending on what switches were changed
         # LKS: Here (and elsewhere) we should probably look into using
         # python f-strings rather than string concatenation.
-        message = (
-            "Change made to switches.\nAll switches were changed.\nStatus: "
-            + status
-            + "\nPath to stdout: "
-            + str(stdoutPath.name)
-        )
+        change_message = "All switches were changed."
     else:
-        message = (
-            "Change made to switches.\nSwitches: \n"
-            + strSwitchList
-            + "\nStatus: "
-            + status
-            + "\nPath to stdout: "
-            + str(stdoutPath.name)
-        )
+        change_message = f"Switches: {strSwitchList}"
+
+    message = "\n".join([
+        "Change made to switches.",
+        change_message,
+        f"Status: {status}",
+        f"Path to stdout: {stdoutPath.name}",
+        ])
 
     slack_data = {
         "username": "SwitchAlert",
