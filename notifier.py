@@ -204,8 +204,7 @@ def create_app(config_from_env=True, config=None):
         if vlanFlag or switchList:
             current_app.logger.info("changes detected")
 
-            commitID = request.json["commits"][0]
-            print(commitID)
+            commitID = request.json["head_commit"]["id"]
             updateRepo(repoDir, repoURL, commitID)
             status, stdoutPath = runAnsible(repoDir, vlanFlag, switchList)
 
