@@ -1,0 +1,9 @@
+flask
+gunicorn
+ansible
+ansible_runner
+ansible-pylibssh
+jsonschema
+GitPython
+requests
+python-dotenv
