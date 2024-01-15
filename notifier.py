@@ -128,7 +128,7 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
             ),
             slack.SlackSectionBlock(
                 text=slack.SlackMarkdown(
-                    text=f"Changes detected in switch configuration.\nEffected switches:{change_message}\nStatus of change: {status}"
+                    text=f"Changes detected in switch configuration.\nEffected switches:{change_message}\nStatus: {status}"
                 )
             ),
         ],
@@ -150,7 +150,7 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
                 current_app.logger.info("Slack notification sent")
             except slack.SlackException as err:
                 current_app.logger.error("slack notification failed: %s", err)
-    return {"status": "success"}
+    return "success", 200
 
 
 
