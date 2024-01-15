@@ -47,7 +47,7 @@ def test_vlan_change_deploy_success(fake_run, httpserver, testapp, client):
     fake_run.return_value = Mock(status="successful", stdout=Path("."))
 
     httpserver.expect_request("/notify").respond_with_handler(handler)
-    res = client.post("/webhook", json=notify_with_vlan_change)
+    res = client.post("/webhook", json=notify_with_vlan_change, headers={"x-github-event": "push"})
     assert res.status_code == 200
     httpserver.check_assertions()
 
@@ -60,7 +60,7 @@ def test_vlan_change_deploy_failure(fake_run, httpserver, testapp, client):
     fake_run.return_value = Mock(status="failed", stdout=Path("."))
 
     httpserver.expect_request("/notify").respond_with_handler(handler)
-    res = client.post("/webhook", json=notify_with_vlan_change)
+    res = client.post("/webhook", json=notify_with_vlan_change, headers={"x-github-event": "push"})
     assert res.status_code == 200
     httpserver.check_assertions()
 
@@ -73,7 +73,7 @@ def test_switch_change_deploy_success(fake_run, httpserver, testapp, client):
     fake_run.return_value = Mock(status="successful", stdout=Path("."))
 
     httpserver.expect_request("/notify").respond_with_handler(handler)
-    res = client.post("/webhook", json=notify_with_switch_change)
+    res = client.post("/webhook", json=notify_with_switch_change, headers={"x-github-event": "push"})
     assert res.status_code == 200
     httpserver.check_assertions()
 
@@ -86,6 +86,6 @@ def test_switch_change_deploy_failure(fake_run, httpserver, testapp, client):
     fake_run.return_value = Mock(status="failed", stdout=Path("."))
 
     httpserver.expect_request("/notify").respond_with_handler(handler)
-    res = client.post("/webhook", json=notify_with_switch_change)
+    res = client.post("/webhook", json=notify_with_switch_change, headers={"x-github-event": "push"})
     assert res.status_code == 200
     httpserver.check_assertions()
