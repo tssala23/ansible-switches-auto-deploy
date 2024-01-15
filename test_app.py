@@ -3,10 +3,14 @@ import pytest
 import notifier
 from pathlib import Path
 
-notify_with_vlan_change = {"commits": [{"modified": ["group_vars/all/vlans.yaml"]}]}
+notify_with_vlan_change = {
+    "commits": [{"modified": ["group_vars/all/vlans.yaml"]}],
+    "head_commit": {"id":"b7b84665d4a848dfd57980348fc04c0392a63bb7"}
+    }
 
 notify_with_switch_change = {
-    "commits": [{"modified": ["host_vars/switch1/interfaces.yaml"]}]
+    "commits": [{"modified": ["host_vars/switch1/interfaces.yaml"]}],
+    "head_commit": {"id":"b7b84665d4a848dfd57980348fc04c0392a63bb7"}
 }
 
 
