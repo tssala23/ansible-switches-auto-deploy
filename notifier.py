@@ -134,7 +134,7 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
         ],
     )
 
-    message.attachments = [
+    """message.attachments = [
         slack.SlackAttachment(
             blocks=[
                 slack.SlackSectionBlock(
@@ -142,7 +142,7 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
                 ),
             ]
         ),
-    ]
+    ]"""
 
     if current_app.notifier:
             try:
