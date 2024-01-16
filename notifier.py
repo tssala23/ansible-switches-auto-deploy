@@ -8,6 +8,7 @@ import logging
 import slack
 import github
 
+os.environ['ANSIBLE_NOCOLOR'] = "True"
 
 class CONFIG_DEFAULTS:
     COLOR_SUCCESS = "#05eb2f"
@@ -91,7 +92,7 @@ def runAnsible(repoDir, vlanFlag, switchList):
     return (res.status, res.stdout)
 
 
-def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
+def sendAlert(vlanFlag, switchList, status, stringPath):
     """Send notification to slack channel"""
     strSwitchList = ",".join(
         str(switch) for switch in switchList # map(str, switchList)
@@ -115,7 +116,7 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
     if request.headers["X-GitHub-Event"] != "push":
         abort(400, "Unsupported event")
 
-    with open(stdoutPath, 'r') as file:
+    with open(stringPath, 'r') as file:
         stdout = file.read()
     if len(stdout) > 2990:
         stdout = stdout[-2990:]
@@ -207,8 +208,10 @@ def create_app(config_from_env=True, config=None):
             updateRepo(repoDir, repoURL, commitID)
             status, stdoutPath = runAnsible(repoDir, vlanFlag, switchList)
 
+            stringPath = str(stdoutPath)
+
             current_app.logger.info("sending notification to %s", webhookURL)
-            sendAlert(vlanFlag, switchList, status, stdoutPath, webhookURL)
+            sendAlert(vlanFlag, switchList, status, stringPath)
         return "success", 200
 
     @app.before_request
