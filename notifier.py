@@ -1,5 +1,4 @@
 from flask import Flask, request, current_app, abort
-import git
 from git import Repo
 import ansible_runner
 import os
@@ -98,11 +97,6 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
         str(switch) for switch in switchList # map(str, switchList)
     )  # Convert the list to string, items seperated by commas
 
-    if status == "failed":
-        color = current_app.config["COLOR_FAILURE"]
-    else:
-        color = current_app.config["COLOR_SUCCESS"]
-
     if (
         vlanFlag
     ):  # Create the messages for the alerts, different depending on what switches were changed
@@ -121,6 +115,11 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
     if request.headers["X-GitHub-Event"] != "push":
         abort(400, "Unsupported event")
 
+    with open(stdoutPath, 'r') as file:
+        stdout = file.read()
+    if len(stdout) > 2990:
+        stdout = stdout[-2990:]
+
     message = slack.SlackMessage(
         blocks=[
             slack.SlackHeaderBlock(
@@ -134,15 +133,15 @@ def sendAlert(vlanFlag, switchList, status, stdoutPath, webhook_url):
         ],
     )
 
-    """message.attachments = [
+    message.attachments = [
         slack.SlackAttachment(
             blocks=[
                 slack.SlackSectionBlock(
-                    text=slack.SlackMarkdown(text=f"```\n{stdoutPath}\n```")
+                    text=slack.SlackMarkdown(text=f"```\n{stdout}\n```")
                 ),
             ]
         ),
-    ]"""
+    ]
 
     if current_app.notifier:
             try:
