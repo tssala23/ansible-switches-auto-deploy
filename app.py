@@ -1,6 +1,6 @@
-from webapp import app
+import notifier
 
-app = create_app()
+app = notifier.create_app()
 
 if __name__ == "__main__":
     app.run()
