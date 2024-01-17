@@ -40,6 +40,10 @@ def updateRepo(repoDir, repoURL, commitID):
         repo.git.checkout(commitID)
         current_app.logger.info("clone %s", repoURL)
 
+def chekoutMain(repoDir):
+    repo = Repo(repoDir)
+    repo.git.checkout("main")
+
 
 def fileChanges(
     commits,
@@ -92,7 +96,7 @@ def runAnsible(repoDir, vlanFlag, switchList):
     return (res.status, res.stdout)
 
 
-def sendAlert(vlanFlag, switchList, status, stringPath):
+def sendAlert(vlanFlag, switchList, status, stdoutFile):
     """Send notification to slack channel"""
     strSwitchList = ",".join(
         str(switch) for switch in switchList # map(str, switchList)
@@ -116,19 +120,24 @@ def sendAlert(vlanFlag, switchList, status, stringPath):
     if request.headers["X-GitHub-Event"] != "push":
         abort(400, "Unsupported event")
 
-    with open(stringPath, 'r') as file:
-        stdout = file.read()
+    stdout = stdoutFile.read()
+
     if len(stdout) > 2990:
         stdout = stdout[-2990:]
+    
+    if status == "failed":
+        header = "Switch Notification :large_red_square:"
+    else:
+        header = "Switch Notification :large_green_square:"
 
     message = slack.SlackMessage(
         blocks=[
             slack.SlackHeaderBlock(
-                text=slack.SlackText(text=f"Switch Notification")
+                text=slack.SlackText(text=f"{header}")
             ),
             slack.SlackSectionBlock(
                 text=slack.SlackMarkdown(
-                    text=f"Changes detected in switch configuration.\nEffected switches:{change_message}\nStatus: {status}"
+                    text=f"Changes detected in switch configuration.\nEffected switches: {change_message}\nStatus: {status.upper()}"
                 )
             ),
         ],
@@ -192,6 +201,7 @@ def create_app(config_from_env=True, config=None):
 
         current_app.logger.info("received valid notification from github")
 
+        #Read in config from .env file
         repoURL = current_app.config["AUTODEPLOY_REPOURL"]
         repoDir = current_app.config.get(
             "AUTODEPLOY_REPODIR", os.path.basename(repoURL)
@@ -205,13 +215,16 @@ def create_app(config_from_env=True, config=None):
             current_app.logger.info("changes detected")
 
             commitID = request.json["head_commit"]["id"]
-            updateRepo(repoDir, repoURL, commitID)
-            status, stdoutPath = runAnsible(repoDir, vlanFlag, switchList)
 
-            stringPath = str(stdoutPath)
+            updateRepo(repoDir, repoURL, commitID)
+            status, stdoutFile = runAnsible(repoDir, vlanFlag, switchList)
 
             current_app.logger.info("sending notification to %s", webhookURL)
-            sendAlert(vlanFlag, switchList, status, stringPath)
+
+            sendAlert(vlanFlag, switchList, status, stdoutFile)
+
+            chekoutMain(repoDir)
+
         return "success", 200
 
     @app.before_request
