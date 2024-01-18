@@ -1,5 +1,5 @@
 from flask import Flask, request, current_app, abort
-from git import Repo
+import git
 import ansible_runner
 import os
 import requests
@@ -30,19 +30,17 @@ def updateRepo(repoDir, repoURL, commitID):
     if os.path.isdir(
         repoDir
     ):  # If the clone of the repo exists pull updates, if not clone it
-        repo = Repo(repoDir)
+        repo = git.Repo(repoDir)
         o = repo.remotes.origin
+        repo.git.checkout("main")
         o.pull()
         repo.git.checkout(commitID)
         current_app.logger.info("pulled changes for %s", repoURL)
     else:
-        repo = Repo.clone_from(repoURL, repoDir, no_checkout=True)
+        repo = git.Repo.clone_from(repoURL, repoDir, no_checkout=True)
         repo.git.checkout(commitID)
         current_app.logger.info("clone %s", repoURL)
 
-def chekoutMain(repoDir):
-    repo = Repo(repoDir)
-    repo.git.checkout("main")
 
 
 def fileChanges(
@@ -222,8 +220,6 @@ def create_app(config_from_env=True, config=None):
             current_app.logger.info("sending notification to %s", webhookURL)
 
             sendAlert(vlanFlag, switchList, status, stdoutFile)
-
-            chekoutMain(repoDir)
 
         return "success", 200
 
