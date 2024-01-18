@@ -108,15 +108,6 @@ def sendAlert(vlanFlag, switchList, status, stdoutFile):
         change_message = "All switches were changed."
     else:
         change_message = f"Switches: {strSwitchList}"
-    
-    if "X-GitHub-Event" not in request.headers:
-        abort(400, "Missing x-github-event header")
-
-    if request.headers["X-GitHub-Event"] == "ping":
-        return {"status": "ping successful"}
-
-    if request.headers["X-GitHub-Event"] != "push":
-        abort(400, "Unsupported event")
 
     stdout = stdoutFile.read()
 
@@ -196,6 +187,15 @@ def create_app(config_from_env=True, config=None):
         except github.WebhookSignatureError as err:
             current_app.logger.error(f"invalid signature: {err}")
             abort(400, "Bad signature")
+
+        if "X-GitHub-Event" not in request.headers:
+            abort(400, "Missing x-github-event header")
+
+        if request.headers["X-GitHub-Event"] == "ping":
+            return {"status": "ping successful"}
+
+        if request.headers["X-GitHub-Event"] != "push":
+            abort(400, "Unsupported event")
 
         current_app.logger.info("received valid notification from github")
 
