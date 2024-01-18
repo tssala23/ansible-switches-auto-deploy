@@ -26,6 +26,15 @@ def testapp(httpserver):
 
     yield tester
 
+@pytest.fixture(autouse=True)
+def replace_runansible(tmp_path):
+    with patch("notifier.runAnsible") as mock_runansible, (
+        tmp_path / "ansible_stdout.txt"
+    ) as stdout:
+        with stdout.open("w") as fd:
+            fd.write("this is a test")
+        mock_runansible.return_value = ("success", stdout)
+        yield
 
 @pytest.fixture()
 def client(testapp):
