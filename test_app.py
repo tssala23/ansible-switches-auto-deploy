@@ -33,7 +33,7 @@ def replace_runansible(tmp_path):
     ) as stdout:
         with stdout.open("w") as fd:
             fd.write("this is a test")
-        mock_runansible.return_value = ("success", stdout.open('r'))
+        mock_runansible.return_value = ("successful", stdout.open('r'))
         yield
 
 @pytest.fixture()
