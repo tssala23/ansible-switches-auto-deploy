@@ -1,5 +1,5 @@
 import pytest
-import github
+import slack_notifier.github as github
 
 from dataclasses import dataclass, field
 

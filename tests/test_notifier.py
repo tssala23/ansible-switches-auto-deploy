@@ -1,6 +1,6 @@
 from unittest.mock import patch, Mock
 import pytest
-import notifier
+import slack_notifier.notifier as notifier
 from pathlib import Path
 
 notify_with_vlan_change = {
@@ -28,7 +28,7 @@ def testapp(httpserver):
 
 @pytest.fixture()
 def client(testapp):
-    with patch("notifier.updateRepo"):
+    with patch("slack_notifier.notifier.updateRepo"):
         yield testapp.test_client()
 
 
@@ -49,7 +49,7 @@ def client(testapp):
         (notify_with_switch_change, "failed"),
     ),
 )
-@patch("notifier.ansible_runner.run")
+@patch("slack_notifier.notifier.ansible_runner.run")
 def test_vlan_change_deploy_success(
     fake_run, payload, expected_text, tmp_path, httpserver, testapp, client
 ):

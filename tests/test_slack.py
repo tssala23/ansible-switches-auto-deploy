@@ -1,5 +1,5 @@
 import pytest
-import slack
+import slack_notifier.slack as slack
 
 
 @pytest.mark.parametrize(
