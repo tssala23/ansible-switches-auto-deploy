@@ -1,4 +1,4 @@
-import notifier
+import slack_notifier.notifier as notifier
 
 app = notifier.create_app()
 

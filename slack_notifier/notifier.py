@@ -5,8 +5,8 @@ import os
 import requests
 import json
 import logging
-import slack
-import github
+import slack_notifier.slack as slack
+import slack_notifier.github as github
 
 os.environ['ANSIBLE_NOCOLOR'] = "True"
 
